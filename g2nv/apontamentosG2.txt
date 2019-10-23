@@ -1,3 +1,4 @@
+Cidades/ Tree search
 1) Para evitar ciclos precisamos então de verificar se a ação seguitne não é parente do nó corrente.
 Para tal foi adiciona a função in_parent() e uma verificação.
 
@@ -52,3 +53,16 @@ Se for igual, adicionar a lista.
 
 16) Adicionar campo...
 Calcular a profundidade total e dividir pelo número de nós quando for encontrado o objetivo.
+
+Block World / STRIPS
+
+1) 
+
+
+Rainhas / Constraint SearchNode
+
+1) 
+    IV.4 e IV.5: Definir os grafos paraa cada alinea e os dominios de restrição 
+            e correr o constraintsearch para encontrar a solução
+
+2) Implementar algoritmo de propagação de restrições que se encontra nos slides das aulas
