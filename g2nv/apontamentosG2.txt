@@ -1,0 +1,54 @@
+1) Para evitar ciclos precisamos então de verificar se a ação seguitne não é parente do nó corrente.
+Para tal foi adiciona a função in_parent() e uma verificação.
+
+2) Foi adicionado então um parametro depth à classe SearchNode, de forma a ser possível registrar para cada nó
+a sua profundidade.
+É necessário iniciar o root com depth = 0.
+Durante o search esta vai incrementando consoante.
+
+3) Para calcular o comprimento de uma solução, é necessário adicionar um campo de length ao SearchTree.
+Este deve ser incrementado para cada nó percorrido.
+
+4) Para suportar a pesquisa com profundidade com limite, devemos verificar se a profundidade do nó 
+não ultrapassa o limite definido antes de adicionar a lista de nós abertos.
+
+5) Para calcular nós terminais devemos verificar os nós que não tem filhos e não foram expandidos.
+Os nós não terminais serão que tem filhos ou que foram simplesmente expandidos.
+
+6) Adicionar um campo para o valor da ramificação.
+Calcular a ramificação quando o goal for encontrado.
+
+7) O estado vai em principio ser C1. Verificar em todas conecções se a ação é possível executar.
+Se for encontrada devolver dist.
+
+8) Adicionar um campo de cost ao SearchNode. Usar 7) para calcular o custo de cada ação/transição.
+O custo da raiz será obviamente, 0.
+
+9) Usando 8), o custo de cada nós até a raiz já é calculado. Para obter o custo total da solução, basta 
+verificar o custo do nó goal.
+
+10) é nessário no addToOpen da searchtree adicionar o uniform.
+Na pesquisa de custo uniforme devemos adicionar a priority queue os newnodes ordenados pelo seu custo, de forma
+a que seja sempre escolhido o nó com custo mais baixo.
+
+11) self explanatory. literalmente adicionar um atributo heuristic no searchnode.
+
+12) Supondo que nos podemos mexer em qualquer direção, a melhor heuristica a calcular 
+será a Euclidean distance.
+Tirar as coordenas da origem e destino, calcular.
+Agora finalmente temos alguma coisa para colocar no campo heuristic criado em 11)
+Boa organização professores, a sério <3
+
+13) Adicionar campo em add_to_open.
+Num algoritmo greedy devemos sempre expandir o nó heuristicamente mais próximo da goal.
+Sabendo isto, devemos organizar a lista de nós abertos pela heuristica dos nós.
+
+14) Adicionar campo em add_to_open.
+No algoritmo a*, a lista de nós abertos deve ser organizada tendo em conta o custo atual e a heuristica do nó.
+
+15) Adicionar um campo ao searchtree de nós com maior custo. Adicionar desde principio a raiz.
+Comparar para cada nó iterado se o custo é maior que o nó no campo de nós de maior custo. Caso se verifique substituir.
+Se for igual, adicionar a lista.
+
+16) Adicionar campo...
+Calcular a profundidade total e dividir pelo número de nós quando for encontrado o objetivo.
