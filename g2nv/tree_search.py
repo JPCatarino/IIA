@@ -13,6 +13,7 @@
 #  Inteligência Artificial, 2014-2019
 
 from abc import ABC, abstractmethod
+from functools import reduce
 import sys
 
 # Dominios de pesquisa
@@ -73,8 +74,17 @@ class SearchNode:
     def in_parent(self, state):
         if self.parent == None:
             return False
-        
-        return self.parent.state == state or self.parent.in_parent(state)    
+        if not isinstance(state, list):
+            return self.parent.state == state or self.parent.in_parent(state) 
+        else:
+            return self.checkIfEqual(self.parent.state, state) or self.parent.in_parent(state) 
+
+
+    def checkIfEqual(self, l1, l2):
+        if reduce(lambda i, j : i and j, map(lambda m, k: m == k, l1, l2), True) :  
+            return True
+        else : 
+            return False 
 
     def __str__(self):
         return f"no({self.state}, {self.parent}, {self.depth}, {self.cost}, {self.heuristic})"
@@ -97,6 +107,7 @@ class SearchTree:
         self.cost = 0
         self.highest_cost_nodes = [root]
         self.average_depth = 0
+        self.plan = []
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self,node):
@@ -120,7 +131,7 @@ class SearchTree:
 
             self.length += 1
             if self.problem.goal_test(node.state):
-                self.ramification = (self.non_terminal + self.terminal - 1) / self.non_terminal
+                #self.ramification = (self.non_terminal + self.terminal - 1) / self.non_terminal
                 self.cost = node.cost
                 self.average_depth = total_depth/(self.terminal + self.non_terminal)
                 return self.get_path(node)
@@ -129,6 +140,8 @@ class SearchTree:
                 newstate = self.problem.domain.result(node.state,a)
                 if not node.in_parent(newstate) and node.depth < limit:
                     lnewnodes += [SearchNode(newstate,node,node.depth + 1, node.cost + self.problem.domain.cost(node.state, a), self.problem.domain.heuristic(newstate, self.problem.goal))]
+                    self.plan.append(a)
+
             
             if len(lnewnodes):
                 self.terminal += len(lnewnodes)
