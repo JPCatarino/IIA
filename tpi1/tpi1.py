@@ -3,7 +3,7 @@
 
 from tree_search import *
 from functools import reduce
-import copy
+from math import floor, ceil
 
 class MyTree(SearchTree):
 
@@ -28,7 +28,7 @@ class MyTree(SearchTree):
 
     def effective_branching_factor(self):
         return self.total_nodes ** (1/self.solution_length)
-    
+        
     def update_ancestors(self,node):
         if node.children:
             if len(node.children) > 1:
@@ -38,24 +38,27 @@ class MyTree(SearchTree):
         if node.parent:
             self.update_ancestors(node.parent)
         
-    def discard_worse(self):
+    def discard_worse(self):       
         nwnc = list(filter(lambda x: x.children == None, self.open_nodes))
-        maxV = reduce((lambda n1, n2: max(n1,n2)), list(map(lambda v : v.evalfunc, nwnc)))
-        trm = list(filter(lambda x: x.evalfunc == maxV, nwnc))[0]
+        ntm = list(set(map(lambda x: x.parent, nwnc)))
 
-        self.terminal_nodes -= len(trm.parent.children)
-        for c in trm.parent.children:
-            if c in self.open_nodes:
-                self.open_nodes.remove(c)
-            trm.parent.children.remove(c)
+        ntmnone = [c for c in ntm if all(map(lambda x: x.children == None, c.children))]
+        maxV = reduce((lambda n1, n2: max(n1,n2)), list(map(lambda x : x.evalfunc, ntmnone)))
+        trm = list(set(filter(lambda x: x.evalfunc == maxV, ntmnone)))[0]
+        
+        self.terminal_nodes -= len(trm.children)
+
+        tValue = len(trm.children)
+        lValue = len(self.open_nodes)
+
+        self.open_nodes = [c for c in self.open_nodes if c not in trm.children ]
+        trm.children = None
 
         
-        if len(trm.parent.children) == 0:
-            self.non_terminal_nodes -= 1
-        else:
-            self.terminal_nodes += 1
-
-        self.add_to_open([trm.parent])                    
+        self.non_terminal_nodes -=1
+        self.terminal_nodes +=1
+        self.add_to_open([trm])
+                  
 
     def search2(self):
         while self.open_nodes != []:
@@ -82,17 +85,18 @@ class MyTree(SearchTree):
             
             if len(lnewnodes):
                 self.total_nodes += len(lnewnodes) 
+            
             if node.children:
                 self.non_terminal_nodes += 1
                 self.terminal_nodes += len(node.children)
             
             self.terminal_nodes -= 1
 
+            self.add_to_open(lnewnodes)
+
             if self.max_nodes:
                 while self.terminal_nodes + self.non_terminal_nodes > self.max_nodes:
                     self.discard_worse()
-
-            self.add_to_open(lnewnodes)
         return None
 
     # shows the search tree in the form of a listing
