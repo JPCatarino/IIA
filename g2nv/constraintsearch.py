@@ -58,6 +58,9 @@ class ConstraintSearch:
         # continuação da pesquisa
         # ( falta fazer a propagacao de restricoes )
         for var in domains.keys():
+            queue = list([(xi, xk) for (xi, xk) in self.constraints.keys()])
+            self.propagateConstraints(self.domains, queue)
+
             if len(domains[var])>1:
                 for val in domains[var]:
                     newdomains = dict(domains)
