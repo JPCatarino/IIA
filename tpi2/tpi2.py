@@ -1,4 +1,5 @@
-
+# Jorge Catarino
+# 85028
 
 from semantic_network import *
 from bayes_net import *
