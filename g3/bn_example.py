@@ -22,4 +22,6 @@ bn.add('m',[('a',False)],0.100)
 conjunction = [('j',True),('m',True),('a',True),('r',False),('t',False)]
 
 print(bn.jointProb(conjunction))
-
+print(bn.ancestors("j"))
+print(bn.conjunctions(bn.ancestors("j")))
+print(bn.indProb("j", True))

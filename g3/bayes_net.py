@@ -1,4 +1,4 @@
-
+from itertools import product
 
 class BayesNet:
 
@@ -23,15 +23,27 @@ class BayesNet:
                 if mothers.issubset(conjunction):
                     prob*=(p if val else 1-p)
         return prob
+
+    def ancestors(self, var):
+        tmpAnc = self.get_parents(var)
+        anc = tmpAnc + list(map(lambda x: self.get_parents(x), tmpAnc))
+        return [item for elem in anc for item in elem]
+
+    def get_parents(self, var):
+        var_parents = self.dependencies[var]
+        # Check for each value of the dictionary all the parent values
+        return list(set([prt[0] for key in var_parents.keys() for prt in key]))
+
+    def conjunctions(self, listvar):
+        lcomb = product([True, False], repeat=len(listvar))
+        return list(map(lambda c: list(zip(listvar, c)), lcomb))
     
     # TODO: Actually calculate individual probability
-    def indProb(self, netVal):
-        var, val = netVal
-        prob = 1.0
-
-        for(mothers, p) in self.dependencies[var].items():
-            prob *= (p if val else 1-p)
-        
+    def indProb(self, var, val):
+        C = self.conjunctions(self.ancestors(var))
+        prob = 0.0
+        for c in C:
+            prob += self.jointProb(c+[(var, val)])
         return prob
 
 
