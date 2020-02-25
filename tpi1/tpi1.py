@@ -27,7 +27,12 @@ class MyTree(SearchTree):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: node.evalfunc)
 
     def effective_branching_factor(self):
-        return self.total_nodes ** (1/self.solution_length)
+        bEq = []
+        for i in range(1, self.solution_length + 1):
+            bEq.append(Symbol('B', i, 1))
+        bEq = EBFeq(bEq, self.total_nodes)
+        # Assuming B is always positive
+        return newton_raphson(bEq, bEq.derivate(), 5, 1e-6)
         
     def update_ancestors(self,node):
         if node.children:
@@ -66,6 +71,8 @@ class MyTree(SearchTree):
             node.children = []
 
             if self.problem.goal_test(node.state):
+                self.non_terminal_nodes -= 1
+                self.terminal_nodes +=1
                 self.solution_length = node.depth
                 self.solution_cost = node.cost
                 return self.get_path(node)
@@ -75,10 +82,10 @@ class MyTree(SearchTree):
                 if newstate not in self.get_path(node):
                     newnode = SearchNode(newstate,node)
                     lnewnodes.append(newnode)
-                    lnewnodes[-1].cost = node.cost + self.problem.domain.cost(node.state, a)
-                    lnewnodes[-1].depth = node.depth + 1
-                    lnewnodes[-1].children = None
-                    lnewnodes[-1].evalfunc = newnode.cost + self.problem.domain.heuristic(newstate, self.problem.goal)
+                    newnode.cost = node.cost + self.problem.domain.cost(node.state, a)
+                    newnode.depth = node.depth + 1
+                    newnode.children = None
+                    newnode.evalfunc = newnode.cost + self.problem.domain.heuristic(newstate, self.problem.goal)
 
                     node.children.append(newnode)
                     self.update_ancestors(lnewnodes[-1])
@@ -114,4 +121,41 @@ class MyTree(SearchTree):
             for n in node.children:
                 self.show(heuristic,n,indent+'  ')
 
+class Symbol:
+    
+    def __init__(self, unk, power, value):
+        self.unk = unk
+        self.value = value
+        self.power = power
 
+
+class EBFeq:
+
+    def __init__(self, symbolList, N):
+        self.symbolList = symbolList
+        self.N = N-1
+
+    def derivate(self):
+        d = []
+        for n in self.symbolList:
+            value = n.value * n.power
+            power = n.power-1
+            if value > 0:
+                d.append(Symbol(n.unk,power,value))
+        return EBFeq(d, 1)
+    
+    def calculate(self, v):
+        res = 0
+        for n in self.symbolList:
+            if n.power > 0:
+                res += (n.value*v)**n.power
+            else:
+                res += n.value * v
+        return res - self.N
+
+def newton_raphson(eq, eqd, x, e):
+    d = abs(0-eq.calculate(x))
+    while d > e:
+        x = x - eq.calculate(x)/eqd.calculate(x)
+        d = abs(0-eq.calculate(x))
+    return x

@@ -15,7 +15,7 @@ class MySN(SemanticNetwork):
 
         # Entity may have a subtype, and the subtype dependencies must be considered and added
         subDeps = list(map(lambda x: self.query_dependents(x.relation.entity1),self.query_local(rel="subtype", e2=entity)))
-        deps += [item for elem in [d for d in subDeps] for item in elem]
+        deps += [item for elem in subDeps for item in elem]
 
         # It's necessary to cross each local dependency and check for their subtypes and actual dependencies
         # For dependencies with subtypes, remove entity and add entity subtypes
